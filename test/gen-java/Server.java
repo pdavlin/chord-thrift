@@ -13,6 +13,7 @@ public class Server {
 
 
 	public static void main(String[] args) throws TException {
+		System.out.println("STARTING SERVER");
 		//Create Thrift server socket Server.java
 		TServerTransport serverTransport = new TServerSocket(9090);
 		TTransportFactory factory = new TTransportFactory();
