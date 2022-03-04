@@ -9,8 +9,8 @@ import org.apache.thrift.transport.*;
 import org.apache.thrift.transport.TSSLTransportFactory.TSSLTransportParameters;
 import org.apache.thrift.TException;
 import org.apache.thrift.*;
-public class Server {
 
+public class Server {
 
 	public static void main(String[] args) throws TException {
 		System.out.println("STARTING SERVER");
@@ -21,11 +21,11 @@ public class Server {
 		MultiplyHandler handler = new MultiplyHandler();
 		Multiply.Processor processor = new Multiply.Processor(handler);
 		//Set server arguments
-		TServer.Args serverArgs = new TServer.Args(serverTransport);
+		TThreadPoolServer.Args serverArgs = new TThreadPoolServer.Args(serverTransport);
 		serverArgs.processor(processor); //Set handler
 		serverArgs.transportFactory(factory); //Set FramedTransport (for performance)
 		//Run server as a single thread
-		TServer server = new TSimpleServer(serverArgs);
+		TServer server = new TThreadPoolServer(serverArgs);
 		server.serve(); 
 	}
 }

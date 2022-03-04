@@ -35,12 +35,17 @@ namespace netstd shared
 
 struct NodeData {
 	1: i32 port,
-	2: string id,
-	3: string ip
+	2: i32 id,
+	3: i32 finger
 }
 
 service Node {
-	bool Set(1: string book_title, 2: string genre),
-	string Get(1: string book_title),
-	void UpdateDHT()
+	string get(1:string title),
+	void updateDHT(),
+	bool setBook(1:string title, 2:string genre),
+	NodeData findSuccessor(1: i32 key),
+	NodeData findPred(1: i32 key),
+	NodeData findClosestPrecedingFinger(1: i32 key),
+	NodeData getNodeSuccessor(),
+	NodeData setNodeSuccessor(1: NodeData successor)
 }

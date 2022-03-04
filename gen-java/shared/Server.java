@@ -9,7 +9,6 @@ import org.apache.thrift.transport.*;
 import org.apache.thrift.transport.TSSLTransportFactory.TSSLTransportParameters;
 import org.apache.thrift.TException;
 import org.apache.thrift.*;
-import shared.*;
 
 public class Server {
 
@@ -18,14 +17,15 @@ public class Server {
 		TTransportFactory factory = new TTransportFactory();
 
 
-		NodeHandler nodeHandler = new NodeHandler();
-		Node.Processor nodeProcessor = new Node.Processor();
+		SupernodeHandler supernodeHandler = new SupernodeHandler();
 
-		TServer.Args serverArgs = new TServer.Args(serverTransport);
-		serverArgs.processor(nodeProcessor);
-		serverArgs.trasportFactory(factory);
+		Supernode.Processor supernodeProcessor = new Supernode.Processor(supernodeHandler);
 
-		TServer server = new TSimpleServer(serverArgs);
+		TThreadPoolServer.Args serverArgs = new TThreadPoolServer.Args(serverTransport);
+                serverArgs.processor(supernodeProcessor); //Set handler
+                serverArgs.transportFactory(factory); //Set FramedTransport (for performance)
+		//Run server as multithread
+		TServer server = new TThreadPoolServer(serverArgs);
 		server.serve();
 	}
 }

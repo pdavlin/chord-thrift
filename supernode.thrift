@@ -35,12 +35,12 @@ namespace netstd shared
 
 struct NodeData {
 	1: i32 port,
-	2: string id,
-	3: string ip
+	2: i32 id,
+	3: i32 finger
 }
 
 service Supernode {
-	NodeData Join(1: string ip, 2: i32 port),
-	void PostJoin(1: string ip, 2: i32 port),
-	NodeData GetNode()
+	NodeData join(1: i32 port),
+	void postJoin(1: i32 port),
+	NodeData getNode()
 }

@@ -24,5 +24,8 @@ public class Client {
 		//What you need to do.
 		int ret = client.multiply_2(3, 5);	
 		System.out.println("Ret " + Integer.toString(ret));
+		while (true) {
+
+		}
 	}
 }
