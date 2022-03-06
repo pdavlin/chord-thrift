@@ -230,14 +230,14 @@ public class NodeHandler implements Node.Iface {
 			}
 		}
 		if (currentNode.id > tempNode.id) {
-			if (key > tempNode.id && key <= currentNode.id) {
-				//return currentNode;
+			if (key > currentNode.id && key <= tempNode.id) {
+				return currentNode;
 			
-			//if (key <= tempNode.id && key > currentNode.id) {
+			/*if (key <= tempNode.id && key > currentNode.id) {
 				System.out.println("Making call to FCPF");
 				tempNode = findClosestPrecedingFinger(key);
 				System.out.println("FCPF current node: " + Integer.toString(currentNode.id));
-				System.out.println("FCPF node id found: " + Integer.toString(tempNode.id));
+				System.out.println("FCPF node id found: " + Integer.toString(tempNode.id));*/
 			}
 		}
 		System.out.println("while key<> loop exited, returning tempNode: " + Integer.toString(tempNode.id));
