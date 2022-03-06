@@ -33,6 +33,7 @@ public class NodeHandler implements Node.Iface {
 	private static HashMap<String, String> bookList;
 	private static NodeData currentNode = new NodeData();
 	private static NodeData predNode = new NodeData();
+	private static String loggingNodeId;
 
 	public NodeHandler(int port) {
 		currentNode.port = port;
@@ -44,26 +45,32 @@ public class NodeHandler implements Node.Iface {
 			e.printStackTrace();
 		}
 	}
-
+	public static void nodeLog(String msg) {
+		System.out.println("NODE " + loggingNodeId + ": " + msg);
+	}
+	
+	
 	public void initNode() throws TException {
-		System.out.println("INITIALIZING NODE CONNECTION TO SUPERNODE");
 		//int port = Integer.parseInt(args[0]);
 		//currentNode.port = port;
 		currentNode.id = getHashKey(Integer.toString(currentNode.port));
+		loggingNodeId = Integer.toString(currentNode.id);
 		//boolean server_start = startNodeServer(port);
+		
+		nodeLog("INITIALIZING NODE CONNECTION TO SUPERNODE");
 
 		TTransport transport = new TSocket("localhost", 9090);
 		TProtocol protocol = new TBinaryProtocol(transport);
 		Supernode.Client client = new Supernode.Client(protocol);
 		//Try to connect
 		transport.open();
-		System.out.println("Node Connected to SN");
+		nodeLog("Node Connected to SN");
 
 		//Start local server for node mesh
 		//Check for sys.arg
 		//TODO: error checking for arg length
-		System.out.println("Node @ port:" + Integer.toString(currentNode.port) + " configuring");
-		System.out.println("Node ID: " + currentNode.id);
+		nodeLog("Node @ port:" + Integer.toString(currentNode.port) + " configuring");
+		nodeLog("Node ID: " + currentNode.id);
 
 		//ask supernode about who to talk to to get successor/predecessor
 		//client.getNode();
@@ -72,22 +79,22 @@ public class NodeHandler implements Node.Iface {
 			//nodes.add(nodeData);
 			//findSuccessor(currentNode.id);
 			int key = currentNode.id;
-                        System.out.println("Connecting to fingerNode: " + Integer.toString(nodeData.id) + ":" + Integer.toString(nodeData.port));
+                        nodeLog("Connecting to fingerNode: " + Integer.toString(nodeData.id) + ":" + Integer.toString(nodeData.port));
                         TTransport nodeTransport = new TSocket("localhost", nodeData.port);
                         TProtocol nodeProtocol = new TBinaryProtocol(nodeTransport);
                         Node.Client nodeClient = new Node.Client(nodeProtocol);
                         //Try to connect
-                        System.out.println("opening transport");
+                        nodeLog("opening transport");
                         nodeTransport.open();
-                        System.out.println("Calling client.findSuccessor");
+                        nodeLog("Calling client.findSuccessor");
                         NodeData n = nodeClient.findSuccessor(key);
                         nodes.add(n);
                         nodeTransport.close();
-                        System.out.println("Calling client.findPred");
+                        nodeLog("Calling client.findPred");
                         //NodeData predNode = nodeClient.findPred(key);
                         predNode = findPred(key);
-                        System.out.println("Key: " + Integer.toString(key) + " <> Successor: " + Integer.toString(n.id));
-                        System.out.println("Key: " + Integer.toString(key) + " <> Predecessor: " + Integer.toString(predNode.id));
+                        nodeLog("Key: " + Integer.toString(key) + " <> Successor: " + Integer.toString(n.id));
+                        nodeLog("Key: " + Integer.toString(key) + " <> Predecessor: " + Integer.toString(predNode.id));
 			
                         TTransport predTransport = new TSocket("localhost", predNode.port);
                         TProtocol predProtocol = new TBinaryProtocol(predTransport);
@@ -106,16 +113,16 @@ public class NodeHandler implements Node.Iface {
 			client.postJoin(currentNode.port);
 		}
 		else {
-			System.out.println("Empty node returned - building fresh finger table");
+			nodeLog("Empty node returned - building fresh finger table");
 			predNode = currentNode;
 			for (int i = 0; i < 4; i++) {
 				int key = currentNode.id + (int)(Math.pow(2, i));
 				key = key % 16;
 				currentNode.finger = key;
 				nodes.add(currentNode);
-				System.out.println(Integer.toString(i) + ": " + Integer.toString(key) + " <> Successor: " + Integer.toString(currentNode.id));
+				nodeLog(Integer.toString(i) + ": " + Integer.toString(key) + " <> Successor: " + Integer.toString(currentNode.id));
 			}
-			System.out.println("New Node finger table size: " + Integer.toString(nodes.size()));
+			nodeLog("New Node finger table size: " + Integer.toString(nodes.size()));
 			client.postJoin(currentNode.port);
 		}
 	}
@@ -127,43 +134,43 @@ public class NodeHandler implements Node.Iface {
 
 	@Override
 	public java.lang.String get(java.lang.String book_title) throws org.apache.thrift.TException {
-		System.out.println("Node:" + Integer.toString(currentNode.port) + " attempting get() for book " + book_title);
-		System.out.println("book_title hash: " + Integer.toString(getHashKey(book_title)));
+		nodeLog("Node:" + Integer.toString(currentNode.port) + " attempting get() for book " + book_title);
+		nodeLog("book_title hash: " + Integer.toString(getHashKey(book_title)));
 		return "test";
 	}
 
 	@Override
 	public void updateDHT() throws org.apache.thrift.TException {
-		System.out.println("updating DHT for node ID:Port -> " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
-		System.out.println("Current Finger Table size: " + Integer.toString(nodes.size()));
+		nodeLog("updating DHT for node ID:Port -> " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
+		nodeLog("Current Finger Table size: " + Integer.toString(nodes.size()));
 		for (int i = 1; i < 4; i++) {
-			System.out.println("Trying to get fingertable node " + Integer.toString(i));
+			nodeLog("Trying to get fingertable node " + Integer.toString(i));
 			//NodeData fingerNode = nodes.get(i);
 			int key = currentNode.id + (int)(Math.pow(2, i));
 			key = key % 16;
 			NodeData n = findSuccessor(key);
-			System.out.println("NodeData n returned, trying to add to finger table");
+			nodeLog("NodeData n returned, trying to add to finger table");
 			try {
 				nodes.set(i, n);
 			} catch (IndexOutOfBoundsException e) {
 				nodes.add(n);
 			}
-			System.out.println("Key: " + Integer.toString(key) + " <> Successor: " + Integer.toString(n.id));
+			nodeLog("Key: " + Integer.toString(key) + " <> Successor: " + Integer.toString(n.id));
 		}
 	}
 
 
 	@Override
 	public NodeData findSuccessor(int key) throws TException {
-		System.out.println("Finding Successor for key: " + Integer.toString(key));
+		nodeLog("Finding Successor for key: " + Integer.toString(key));
 		//Key found
 		if (key == currentNode.id) {
-			System.out.println("Current node matches key: " + Integer.toString(key));
+			nodeLog("Current node matches key: " + Integer.toString(key));
 			return currentNode;
 		}
 		//Only node in cluster will hold all keys
 		if (nodes.size() == 0) {
-			System.out.println("No nodes in finger table, this node will hold all keys");
+			nodeLog("No nodes in finger table, this node will hold all keys");
 			predNode = currentNode;
 			return currentNode;
 		}
@@ -182,11 +189,11 @@ public class NodeHandler implements Node.Iface {
 		Node.Client client = new Node.Client(protocol);
 		//Try to connect
 		transport.open();
-		System.out.println("attempting client.getNodeSuccessor()");
+		nodeLog("attempting client.getNodeSuccessor()");
 
 		//TODO: locking here when adding node 2 to cluster
 		NodeData n = client.getNodeSuccessor();
-		System.out.println("client.getNodeSuccessor() returned");
+		nodeLog("client.getNodeSuccessor() returned");
 		transport.close();
 		//return findPred(key);
 		return n;
@@ -194,17 +201,17 @@ public class NodeHandler implements Node.Iface {
 
 	@Override
 	public NodeData findPred(int key) {
-		System.out.println("Finding Predecessor for key: " + Integer.toString(key));
+		nodeLog("Finding Predecessor for key: " + Integer.toString(key));
 		//Compare node to successor
-		System.out.println("Current Node: " + Integer.toString(currentNode.id));
+		nodeLog("Current Node: " + Integer.toString(currentNode.id));
 		NodeData tempNode = nodes.get(0);
 		//TODO: HOW DO I DO THIS LOGIC CORRECTLY I AM LOCKING MY STUFFFFFFFFFFFF
 		//predNode being returned as currentNode incorrectly?
-		System.out.println("successor ID: " + Integer.toString(tempNode.id));
+		nodeLog("successor ID: " + Integer.toString(tempNode.id));
 		/*if (currentNode.id > tempNode.id) {
-			System.out.println("currentNode.id > tempNode.id");
+			nodeLog("currentNode.id > tempNode.id");
 			if (key <= tempNode.id || key >= currentNode.id) {
-				System.out.println("key <= tempNode.id || key >= currentNode.id");
+				nodeLog("key <= tempNode.id || key >= currentNode.id");
 				return currentNode;
 			}
 			else {
@@ -213,9 +220,9 @@ public class NodeHandler implements Node.Iface {
 			}
 		}
 		else {
-			System.out.println("currentNode.id <= tempNode.id");
+			nodeLog("currentNode.id <= tempNode.id");
 			if (key > currentNode.id || key <= tempNode.id) {
-				System.out.println("key > currentNode.id || key <= tempNode.id");
+				nodeLog("key > currentNode.id || key <= tempNode.id");
 				return currentNode;
 			}
 			else {
@@ -233,19 +240,19 @@ public class NodeHandler implements Node.Iface {
 				return currentNode;
 			
 			/*if (key <= tempNode.id && key > currentNode.id) {
-				System.out.println("Making call to FCPF");
+				nodeLog("Making call to FCPF");
 				tempNode = findClosestPrecedingFinger(key);
-				System.out.println("FCPF current node: " + Integer.toString(currentNode.id));
-				System.out.println("FCPF node id found: " + Integer.toString(tempNode.id));*/
+				nodeLog("FCPF current node: " + Integer.toString(currentNode.id));
+				nodeLog("FCPF node id found: " + Integer.toString(tempNode.id));*/
 			//}
 		}
-		System.out.println("while key<> loop exited, returning tempNode: " + Integer.toString(tempNode.id));
+		nodeLog("while key<> loop exited, returning tempNode: " + Integer.toString(tempNode.id));
 		return tempNode;
 	}
 
 	@Override
 	public NodeData findClosestPrecedingFinger(int key) {
-		System.out.println("Finding closest finger for key: " + Integer.toString(key) + " @ node ID: " + Integer.toString(currentNode.id));
+		nodeLog("Finding closest finger for key: " + Integer.toString(key) + " @ node ID: " + Integer.toString(currentNode.id));
 		for (int i = nodes.size() - 1; i >= 0; i--) {
 			NodeData f = nodes.get(i);
 			if (f.id > currentNode.id && f.id < key) {
@@ -257,14 +264,14 @@ public class NodeHandler implements Node.Iface {
 
 	@Override
 	public NodeData getNodeSuccessor() {
-		System.out.println("getNodeSuccessor reached @ node " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
+		nodeLog("getNodeSuccessor reached @ node " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
 		if (nodes.size() > 0) {
 			NodeData s = nodes.get(0);
-			System.out.println("getNodeSuccessor: " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port) + " -> " + Integer.toString(s.id) + ":" + Integer.toString(s.port));
+			nodeLog("getNodeSuccessor: " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port) + " -> " + Integer.toString(s.id) + ":" + Integer.toString(s.port));
 			return s;
 		}
 		else {
-			System.out.println("No successor node @ node:Port -> " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
+			nodeLog("No successor node @ node:Port -> " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
 			return null;
 		}
 	}
@@ -273,7 +280,7 @@ public class NodeHandler implements Node.Iface {
 	public void setNodeSuccessor(NodeData successor) {
 		if (nodes.size() > 0) {
 			nodes.set(0, successor);
-			System.out.println("Node " + Integer.toString(currentNode.id) + " Successor updated to " + Integer.toString(successor.id));
+			nodeLog("Node " + Integer.toString(currentNode.id) + " Successor updated to " + Integer.toString(successor.id));
 		}
 	}
 
@@ -281,7 +288,7 @@ public class NodeHandler implements Node.Iface {
 	
 	public static int getHashKey(String input) {
 		try {
-			System.out.println("Attempting to get hash for string: " + input);
+			nodeLog("Attempting to get hash for string: " + input);
 			MessageDigest md = MessageDigest.getInstance("SHA-1");
 			byte[] encoded = md.digest(input.getBytes("UTF-8"));
 			StringBuffer hex = new StringBuffer();
@@ -316,7 +323,7 @@ public class NodeHandler implements Node.Iface {
 		/*nodes = new ArrayList<NodeData>(4);
 		bookList = new HashMap<String, String>();
 
-		System.out.println("INITIALIZING NODE CONNECTION TO SUPERNODE");
+		nodeLog("INITIALIZING NODE CONNECTION TO SUPERNODE");
 		//int port = Integer.parseInt(args[0]);
 		//currentNode.port = port;
 		currentNode.id = getHashKey(Integer.toString(currentNode.port));
@@ -327,13 +334,13 @@ public class NodeHandler implements Node.Iface {
 		Supernode.Client client = new Supernode.Client(protocol);
 		//Try to connect
 		transport.open();
-		System.out.println("Node Connected to SN");
+		nodeLog("Node Connected to SN");
 
 		//Start local server for node mesh
 		//Check for sys.arg
 		//TODO: error checking for arg length
-		System.out.println("Node @ port:" + Integer.toString(currentNode.port) + " configuring");
-		System.out.println("Node ID: " + currentNode.id);
+		nodeLog("Node @ port:" + Integer.toString(currentNode.port) + " configuring");
+		nodeLog("Node ID: " + currentNode.id);
 
 		//ask supernode about who to talk to to get successor/predecessor
 		//client.getNode();
@@ -344,14 +351,14 @@ public class NodeHandler implements Node.Iface {
 			//testGetSuccessor(nodeData);
 		}
 		else {
-			System.out.println("Empty node returned - building fresh finger table");
+			nodeLog("Empty node returned - building fresh finger table");
 			predNode = currentNode;
 			for (int i = 0; i < 4; i++) {
 				int key = currentNode.id + (int)(Math.pow(2, i));
 				key = key % 16;
 				currentNode.finger = key;
 				nodes.add(currentNode);
-				System.out.println(Integer.toString(i) + ": " + Integer.toString(key) + " <> Successor: " + Integer.toString(currentNode.id));
+				nodeLog(Integer.toString(i) + ": " + Integer.toString(key) + " <> Successor: " + Integer.toString(currentNode.id));
 			}
 		}
 		client.postJoin(currentNode.port);
@@ -361,28 +368,28 @@ public class NodeHandler implements Node.Iface {
 }
 /*
 	private static void testGetSuccessor(NodeData fingerNode) throws org.apache.thrift.TException {
-		System.out.println("testGetSuccessor ID:Port -> " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
-		//System.out.println("testGetPred ID:Port -> " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
+		nodeLog("testGetSuccessor ID:Port -> " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
+		//nodeLog("testGetPred ID:Port -> " + Integer.toString(currentNode.id) + ":" + Integer.toString(currentNode.port));
 		int i = 0;
 		//for (int i = 0; i < 4; i++) {
 		//	NodeData fingerNode = nodes.get(0);
 			//int key = currentNode.id + (int)(Math.pow(2, i));
 			//key = key % 16;
 			int key = currentNode.id;
-			System.out.println("Connecting to fingerNode: " + Integer.toString(fingerNode.id) + ":" + Integer.toString(fingerNode.port));
+			nodeLog("Connecting to fingerNode: " + Integer.toString(fingerNode.id) + ":" + Integer.toString(fingerNode.port));
 			TTransport transport = new TSocket("localhost", fingerNode.port);
 			TProtocol protocol = new TBinaryProtocol(transport);
 			Node.Client client = new Node.Client(protocol);
 			//Try to connect
-			System.out.println("opening transport");
+			nodeLog("opening transport");
 			transport.open();
-			System.out.println("Calling client.findSuccessor");
+			nodeLog("Calling client.findSuccessor");
 			NodeData n = client.findSuccessor(key);
-			System.out.println("Calling client.findPred");
+			nodeLog("Calling client.findPred");
 			NodeData predNode = client.findPred(key);
 			nodes.add(n);
 			transport.close();
-			System.out.println("Key: " + Integer.toString(key) + " <> Successor: " + Integer.toString(n.id));
+			nodeLog("Key: " + Integer.toString(key) + " <> Successor: " + Integer.toString(n.id));
 
 
 			TTransport predTransport = new TSocket("localhost", predNode.port);
@@ -393,13 +400,13 @@ public class NodeHandler implements Node.Iface {
 			predClient.setNodeSuccessor(currentNode);
 			predClient.updateDHT();
 			predTransport.close();			
-			//System.out.println("Key: " + Integer.toString(key) + " <> Predecessor: " + Integer.toString(n.id));
+			//nodeLog("Key: " + Integer.toString(key) + " <> Predecessor: " + Integer.toString(n.id));
 		//}
 	}*/
 
 
 	/*public static boolean startNodeServer(int port) throws TException {
-		System.out.println("Starting node server at port " + Integer.toString(port));
+		nodeLog("Starting node server at port " + Integer.toString(port));
 		TServerTransport serverTransport = new TServerSocket(port);
                 TTransportFactory factory = new TTransportFactory();
                 NodeHandler nodeHandler = new NodeHandler();
@@ -409,20 +416,20 @@ public class NodeHandler implements Node.Iface {
                 serverArgs.transportFactory(factory); //Set FramedTransport (for performance)
                 //Run server as multithread
                 TServer server = new TThreadPoolServer(serverArgs);
-		System.out.println("Node Server Started");
+		nodeLog("Node Server Started");
                 //server.serve();
 		return true;
 	}*/
 /*public static boolean testNodeClientConn(NodeData node) throws TException {
-		System.out.println("INITIALIZIZING NODE " + Integer.toString(currentNode.port) + " CONNECTION TO NODE @ PORT: " + Integer.toString(node.port));
+		nodeLog("INITIALIZIZING NODE " + Integer.toString(currentNode.port) + " CONNECTION TO NODE @ PORT: " + Integer.toString(node.port));
 		TTransport transport = new TSocket("localhost", node.port);
 		TProtocol protocol = new TBinaryProtocol(transport);
 		Node.Client client = new Node.Client(protocol);
 		//Try to connect
 		transport.open();
-		System.out.println("Nodes connected");
+		nodeLog("Nodes connected");
 		//String getTest = client.get("testbook");
-		//System.out.println("testNodeClientConn getTest == " + getTest);
+		//nodeLog("testNodeClientConn getTest == " + getTest);
 		//Build original finger table
 		nodes.clear();
 		for (int i = 0; i < 4; i++) {
@@ -430,7 +437,7 @@ public class NodeHandler implements Node.Iface {
 			key = key % 16;
 			NodeData n = client.findSuccessor(key);
 			nodes.add(n);
-			System.out.println("Key: " + Integer.toString(key) + " <> Successor: " + Integer.toString(n.id));
+			nodeLog("Key: " + Integer.toString(key) + " <> Successor: " + Integer.toString(n.id));
 		}
 		transport.close();
 		return true;
