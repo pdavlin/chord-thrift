@@ -86,7 +86,6 @@ public class NodeHandler implements Node.Iface {
 			predNode = findPred(key);
 
 			nodeLog("Key {} successor: {}", key, n.id);
-			nodeLog("Key {} successor: {}", key, predNode.id);
 
 			TTransport predTransport = new TSocket("localhost", predNode.port);
 			TProtocol predProtocol = new TBinaryProtocol(predTransport);
