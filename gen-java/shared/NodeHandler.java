@@ -146,7 +146,7 @@ public class NodeHandler implements Node.Iface {
 			} catch (IndexOutOfBoundsException e) {
 				nodes.add(n);
 			}
-			nodeLog("Key {} successor: {}", key, n.id);
+			nodeLog("{}: Key {} successor: {}", i, key, n.id);
 		}
 	}
 
@@ -192,7 +192,7 @@ public class NodeHandler implements Node.Iface {
 
 		NodeData tempNode = nodes.get(0);
 
-		nodeLog("successor ID: ", tempNode.id);
+		nodeLog("successor ID: {}", tempNode.id);
 
 		// TODO: HOW DO I DO THIS LOGIC CORRECTLY I AM LOCKING MY STUFFFFFFFFFFFF
 
