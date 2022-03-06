@@ -224,6 +224,11 @@ public class NodeHandler implements Node.Iface {
 				return tempNode;
 			}
 		}*/
+		if (currentNode.id < tempNode.id) {
+			if (key > currentNode.id && key <= tempNode.id) {
+				return currentNode;
+			}
+		}
 		if (currentNode.id > tempNode.id) {
 			if (key <= tempNode.id && key > currentNode.id) {
 				System.out.println("Making call to FCPF");
@@ -232,7 +237,7 @@ public class NodeHandler implements Node.Iface {
 				System.out.println("FCPF node id found: " + Integer.toString(tempNode.id));
 			}
 		}
-		System.out.println("while key<> loop exited, returning tempNode");
+		System.out.println("while key<> loop exited, returning tempNode: " + Integer.toString(tempNode.id));
 		return tempNode;
 	}
 
