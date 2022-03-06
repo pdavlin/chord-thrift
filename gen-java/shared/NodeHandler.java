@@ -87,6 +87,7 @@ public class NodeHandler implements Node.Iface {
                         //NodeData predNode = nodeClient.findPred(key);
                         predNode = findPred(key);
                         System.out.println("Key: " + Integer.toString(key) + " <> Successor: " + Integer.toString(n.id));
+                        System.out.println("Key: " + Integer.toString(key) + " <> Predecessor: " + Integer.toString(predNode.id));
 			
                         TTransport predTransport = new TSocket("localhost", predNode.port);
                         TProtocol predProtocol = new TBinaryProtocol(predTransport);
@@ -170,9 +171,13 @@ public class NodeHandler implements Node.Iface {
 		NodeData predecessor = findPred(key);
 
 
-		if (predecessor.id != currentNode.id) {
+		if (predecessor.id == currentNode.id) {
 			return nodes.get(0);
 		}
+		/*NodeData succ = nodes.get(0);
+		if (predecessor.id == succ.id) {
+			return succ;
+		}*/
 		TTransport transport = new TSocket("localhost", predecessor.port);
 		TProtocol protocol = new TBinaryProtocol(transport);
 		Node.Client client = new Node.Client(protocol);
@@ -180,6 +185,7 @@ public class NodeHandler implements Node.Iface {
 		transport.open();
 		System.out.println("attempting client.getNodeSuccessor()");
 
+		//TODO: locking here when adding node 2 to cluster
 		NodeData n = client.getNodeSuccessor();
 		System.out.println("client.getNodeSuccessor() returned");
 		transport.close();
@@ -190,18 +196,41 @@ public class NodeHandler implements Node.Iface {
 	@Override
 	public NodeData findPred(int key) {
 		System.out.println("Finding Predecessor for key: " + Integer.toString(key));
-		//CHANGE LOGIC TO CONN TO SUCC?
 		//Compare node to successor
+		System.out.println("Current Node: " + Integer.toString(currentNode.id));
 		NodeData tempNode = nodes.get(0);
-		if (tempNode.id == currentNode.id) {
-			System.out.println("tempNode.id = currentNode.id, returning as predNode");
-			predNode = currentNode;
-			return predNode;		
-		}
+		//TODO: HOW DO I DO THIS LOGIC CORRECTLY I AM LOCKING MY STUFFFFFFFFFFFF
+		//predNode being returned as currentNode incorrectly?
 		System.out.println("successor ID: " + Integer.toString(tempNode.id));
-		while (key <= tempNode.id && key > tempNode.id) {
-			System.out.println("Making call to FCPF");
-			tempNode = findClosestPrecedingFinger(key);
+		/*if (currentNode.id > tempNode.id) {
+			System.out.println("currentNode.id > tempNode.id");
+			if (key <= tempNode.id || key >= currentNode.id) {
+				System.out.println("key <= tempNode.id || key >= currentNode.id");
+				return currentNode;
+			}
+			else {
+				tempNode = findClosestPrecedingFinger(key);
+				return tempNode;
+			}
+		}
+		else {
+			System.out.println("currentNode.id <= tempNode.id");
+			if (key > currentNode.id || key <= tempNode.id) {
+				System.out.println("key > currentNode.id || key <= tempNode.id");
+				return currentNode;
+			}
+			else {
+				tempNode = findClosestPrecedingFinger(key);
+				return tempNode;
+			}
+		}*/
+		if (currentNode.id > tempNode.id) {
+			if (key <= tempNode.id && key > currentNode.id) {
+				System.out.println("Making call to FCPF");
+				tempNode = findClosestPrecedingFinger(key);
+				System.out.println("FCPF current node: " + Integer.toString(currentNode.id));
+				System.out.println("FCPF node id found: " + Integer.toString(tempNode.id));
+			}
 		}
 		System.out.println("while key<> loop exited, returning tempNode");
 		return tempNode;
@@ -210,7 +239,7 @@ public class NodeHandler implements Node.Iface {
 	@Override
 	public NodeData findClosestPrecedingFinger(int key) {
 		System.out.println("Finding closest finger for key: " + Integer.toString(key) + " @ node ID: " + Integer.toString(currentNode.id));
-		for (int i = nodes.size(); i > 0; i--) {
+		for (int i = nodes.size() - 1; i >= 0; i--) {
 			NodeData f = nodes.get(i);
 			if (f.id > currentNode.id && f.id < key) {
 				return f;
