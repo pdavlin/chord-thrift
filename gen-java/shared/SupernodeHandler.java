@@ -6,6 +6,7 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.*;
 import org.apache.thrift.transport.TSSLTransportFactory.TSSLTransportParameters;
+import org.slf4j.helpers.MessageFormatter;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -34,7 +35,8 @@ public class SupernodeHandler implements Supernode.Iface {
 			joinLock = true;
 			Random r = new Random();
 			int i = r.nextInt(nodes.size());	
-			System.out.println("Returning node @ index: " + Integer.toString(i));
+			// System.out.println("Returning node @ index: " + Integer.toString(i));
+			supernodeLog("Returning node at index {}", i);
 			return nodes.get(i);
 		}
 		joinLock = true;
@@ -44,14 +46,16 @@ public class SupernodeHandler implements Supernode.Iface {
 
 	@Override
 	public void postJoin(int port) throws org.apache.thrift.TException {
-		System.out.println("postJoin reached. New node at port " + Integer.toString(port));
+		// System.out.println("postJoin reached. New node at port " + Integer.toString(port));
+		supernodeLog("New node established at port {}", port);
 		NodeData nodeData = new NodeData();
 		nodeData.id = getHashKey(Integer.toString(port));
 		nodeData.port = port;
 		nodes.add(nodeData);
 		//TODO: add method to pretty print node list
 		//release joinLock, adding procedure is complete
-		System.out.println("NodeList new length: " + Integer.toString(nodes.size()));
+		// System.out.println("NodeList new length: " + Integer.toString(nodes.size()));
+		supernodeLog("NodeList new length {}", nodes.size());
 		joinLock = false;
 	}
 
@@ -62,7 +66,8 @@ public class SupernodeHandler implements Supernode.Iface {
 			//return existing node
 			Random r = new Random();
 			int i = r.nextInt(nodes.size());	
-			System.out.println("Returning node @ index: " + Integer.toString(i));
+			// System.out.println("Returning node @ index: " + Integer.toString(i));
+			supernodeLog("Returning node at index {}", i);
 			return nodes.get(i);
 		}
 		System.out.println("NodeList is empty, returning new NodeData");
@@ -71,7 +76,8 @@ public class SupernodeHandler implements Supernode.Iface {
 
 	public static int getHashKey(String input) {
                 try {
-                        System.out.println("Attempting to get hash for string: " + input);
+                        // System.out.println("Attempting to get hash for string: " + input);
+						supernodeLog("Attempting to get hash for string: {}", input);
                         MessageDigest md = MessageDigest.getInstance("SHA-1");
                         byte[] encoded = md.digest(input.getBytes("UTF-8"));
                         StringBuffer hex = new StringBuffer();
@@ -99,6 +105,10 @@ public class SupernodeHandler implements Supernode.Iface {
                 return Character.digit(lastChar, 16);
         }	
 
+		public static void supernodeLog(String msg, Object... objects) {
+			System.out.println("SN:  " + MessageFormatter.arrayFormat(msg, objects).getMessage());
+		}
+
         public static void main(String[] args) throws TException {
 		/*//Start conn for nodes
 		System.out.println("Starting Supernode on Port 9090");
@@ -115,13 +125,13 @@ public class SupernodeHandler implements Supernode.Iface {
 
                 TServer server = new TThreadPoolServer(serverArgs);
                 server.serve();*/
-		System.out.println("INITIALIZING SUPERNODE CONNECTION TO SERVER");
+				supernodeLog("INITIALIZING SUPERNODE CONNECTION TO SERVER");
                 TTransport transport = new TSocket("localhost", 9090);
                 TProtocol protocol = new TBinaryProtocol(transport);
                 Supernode.Client client = new Supernode.Client(protocol);
                 //Try to connect
                 transport.open();
-                System.out.println("supernode connected to server");
+                supernodeLog("supernode connected to server");
 		while (true);
 
         }

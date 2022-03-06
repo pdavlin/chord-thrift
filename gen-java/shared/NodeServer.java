@@ -11,10 +11,11 @@ import org.apache.thrift.TException;
 import org.apache.thrift.*;
 
 public class NodeServer {
+        
 
 	public static void main(String[] args) throws TException {
 		int port = Integer.parseInt(args[0]);	
-		System.out.println("Starting node server at port " + Integer.toString(port));
+		System.out.println("NS:  Starting node server at port " + Integer.toString(port));
                 TServerTransport serverTransport = new TServerSocket(port);
                 TTransportFactory factory = new TTransportFactory();
                 NodeHandler nodeHandler = new NodeHandler(port);
@@ -24,7 +25,7 @@ public class NodeServer {
                 serverArgs.transportFactory(factory); //Set FramedTransport (for performance)
                 //Run server as multithread
                 TServer server = new TThreadPoolServer(serverArgs);
-                System.out.println("Node Server Started");
+                System.out.println("NS:  Node Server Started");
                 server.serve();
 	}
 }
