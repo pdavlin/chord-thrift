@@ -228,7 +228,7 @@ public class NodeHandler implements Node.Iface {
 			nodeLog("getNodeSuccessor: {}:{} -> {}:{}", currentNode.id, currentNode.port, s.id, s.port);
 			return s;
 		} else {
-			nodeLog("No succesor node at {}:{}", currentNode.id, currentNode.port);
+			nodeLog("No successor node at {}:{}", currentNode.id, currentNode.port);
 			return null;
 		}
 	}
