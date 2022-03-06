@@ -24,3 +24,6 @@ hs_err_pid*
 
 # project custom
 backup/
+
+.vscode/
+lib/
