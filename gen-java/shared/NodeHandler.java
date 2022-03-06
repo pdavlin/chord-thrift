@@ -188,7 +188,12 @@ public class NodeHandler implements Node.Iface {
 	public NodeData findPred(int key) {
 		nodeLog("Finding predecessor for key {}", key);
 		// Compare node to successor
+		nodeLog("Current Node: {}", currentNode.id);
+
 		NodeData tempNode = nodes.get(0);
+
+		nodeLog("successor ID: ", tempNode.id);
+
 		// TODO: HOW DO I DO THIS LOGIC CORRECTLY I AM LOCKING MY STUFFFFFFFFFFFF
 
 		if (currentNode.id < tempNode.id) {
