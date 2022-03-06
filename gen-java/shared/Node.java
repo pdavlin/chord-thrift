@@ -25,7 +25,7 @@ public class Node {
 
     public NodeData getNodeSuccessor() throws org.apache.thrift.TException;
 
-    public NodeData setNodeSuccessor(NodeData successor) throws org.apache.thrift.TException;
+    public void setNodeSuccessor(NodeData successor) throws org.apache.thrift.TException;
 
   }
 
@@ -45,7 +45,7 @@ public class Node {
 
     public void getNodeSuccessor(org.apache.thrift.async.AsyncMethodCallback<NodeData> resultHandler) throws org.apache.thrift.TException;
 
-    public void setNodeSuccessor(NodeData successor, org.apache.thrift.async.AsyncMethodCallback<NodeData> resultHandler) throws org.apache.thrift.TException;
+    public void setNodeSuccessor(NodeData successor, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -226,10 +226,10 @@ public class Node {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "getNodeSuccessor failed: unknown result");
     }
 
-    public NodeData setNodeSuccessor(NodeData successor) throws org.apache.thrift.TException
+    public void setNodeSuccessor(NodeData successor) throws org.apache.thrift.TException
     {
       send_setNodeSuccessor(successor);
-      return recv_setNodeSuccessor();
+      recv_setNodeSuccessor();
     }
 
     public void send_setNodeSuccessor(NodeData successor) throws org.apache.thrift.TException
@@ -239,14 +239,11 @@ public class Node {
       sendBase("setNodeSuccessor", args);
     }
 
-    public NodeData recv_setNodeSuccessor() throws org.apache.thrift.TException
+    public void recv_setNodeSuccessor() throws org.apache.thrift.TException
     {
       setNodeSuccessor_result result = new setNodeSuccessor_result();
       receiveBase(result, "setNodeSuccessor");
-      if (result.isSetSuccess()) {
-        return result.success;
-      }
-      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "setNodeSuccessor failed: unknown result");
+      return;
     }
 
   }
@@ -488,16 +485,16 @@ public class Node {
       }
     }
 
-    public void setNodeSuccessor(NodeData successor, org.apache.thrift.async.AsyncMethodCallback<NodeData> resultHandler) throws org.apache.thrift.TException {
+    public void setNodeSuccessor(NodeData successor, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler) throws org.apache.thrift.TException {
       checkReady();
       setNodeSuccessor_call method_call = new setNodeSuccessor_call(successor, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
-    public static class setNodeSuccessor_call extends org.apache.thrift.async.TAsyncMethodCall<NodeData> {
+    public static class setNodeSuccessor_call extends org.apache.thrift.async.TAsyncMethodCall<Void> {
       private NodeData successor;
-      public setNodeSuccessor_call(NodeData successor, org.apache.thrift.async.AsyncMethodCallback<NodeData> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public setNodeSuccessor_call(NodeData successor, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.successor = successor;
       }
@@ -510,13 +507,13 @@ public class Node {
         prot.writeMessageEnd();
       }
 
-      public NodeData getResult() throws org.apache.thrift.TException {
+      public Void getResult() throws org.apache.thrift.TException {
         if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new java.lang.IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
         org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
-        return (new Client(prot)).recv_setNodeSuccessor();
+        return null;
       }
     }
 
@@ -740,7 +737,7 @@ public class Node {
 
       public setNodeSuccessor_result getResult(I iface, setNodeSuccessor_args args) throws org.apache.thrift.TException {
         setNodeSuccessor_result result = new setNodeSuccessor_result();
-        result.success = iface.setNodeSuccessor(args.successor);
+        iface.setNodeSuccessor(args.successor);
         return result;
       }
     }
@@ -1196,7 +1193,7 @@ public class Node {
       }
     }
 
-    public static class setNodeSuccessor<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, setNodeSuccessor_args, NodeData> {
+    public static class setNodeSuccessor<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, setNodeSuccessor_args, Void> {
       public setNodeSuccessor() {
         super("setNodeSuccessor");
       }
@@ -1205,12 +1202,11 @@ public class Node {
         return new setNodeSuccessor_args();
       }
 
-      public org.apache.thrift.async.AsyncMethodCallback<NodeData> getResultHandler(final org.apache.thrift.server.AbstractNonblockingServer.AsyncFrameBuffer fb, final int seqid) {
+      public org.apache.thrift.async.AsyncMethodCallback<Void> getResultHandler(final org.apache.thrift.server.AbstractNonblockingServer.AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new org.apache.thrift.async.AsyncMethodCallback<NodeData>() { 
-          public void onComplete(NodeData o) {
+        return new org.apache.thrift.async.AsyncMethodCallback<Void>() { 
+          public void onComplete(Void o) {
             setNodeSuccessor_result result = new setNodeSuccessor_result();
-            result.success = o;
             try {
               fcall.sendResponse(fb, result, org.apache.thrift.protocol.TMessageType.REPLY,seqid);
             } catch (org.apache.thrift.transport.TTransportException e) {
@@ -1252,7 +1248,7 @@ public class Node {
         return false;
       }
 
-      public void start(I iface, setNodeSuccessor_args args, org.apache.thrift.async.AsyncMethodCallback<NodeData> resultHandler) throws org.apache.thrift.TException {
+      public void start(I iface, setNodeSuccessor_args args, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler) throws org.apache.thrift.TException {
         iface.setNodeSuccessor(args.successor,resultHandler);
       }
     }
@@ -6510,16 +6506,14 @@ public class Node {
   public static class setNodeSuccessor_result implements org.apache.thrift.TBase<setNodeSuccessor_result, setNodeSuccessor_result._Fields>, java.io.Serializable, Cloneable, Comparable<setNodeSuccessor_result>   {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("setNodeSuccessor_result");
 
-    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
 
     private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new setNodeSuccessor_resultStandardSchemeFactory();
     private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new setNodeSuccessor_resultTupleSchemeFactory();
 
-    public @org.apache.thrift.annotation.Nullable NodeData success; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      SUCCESS((short)0, "success");
+;
 
       private static final java.util.Map<java.lang.String, _Fields> byName = new java.util.HashMap<java.lang.String, _Fields>();
 
@@ -6535,8 +6529,6 @@ public class Node {
       @org.apache.thrift.annotation.Nullable
       public static _Fields findByThriftId(int fieldId) {
         switch(fieldId) {
-          case 0: // SUCCESS
-            return SUCCESS;
           default:
             return null;
         }
@@ -6576,13 +6568,9 @@ public class Node {
         return _fieldName;
       }
     }
-
-    // isset id assignments
     public static final java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new java.util.EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, NodeData.class)));
       metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(setNodeSuccessor_result.class, metaDataMap);
     }
@@ -6590,20 +6578,10 @@ public class Node {
     public setNodeSuccessor_result() {
     }
 
-    public setNodeSuccessor_result(
-      NodeData success)
-    {
-      this();
-      this.success = success;
-    }
-
     /**
      * Performs a deep copy on <i>other</i>.
      */
     public setNodeSuccessor_result(setNodeSuccessor_result other) {
-      if (other.isSetSuccess()) {
-        this.success = new NodeData(other.success);
-      }
     }
 
     public setNodeSuccessor_result deepCopy() {
@@ -6612,53 +6590,16 @@ public class Node {
 
     @Override
     public void clear() {
-      this.success = null;
-    }
-
-    @org.apache.thrift.annotation.Nullable
-    public NodeData getSuccess() {
-      return this.success;
-    }
-
-    public setNodeSuccessor_result setSuccess(@org.apache.thrift.annotation.Nullable NodeData success) {
-      this.success = success;
-      return this;
-    }
-
-    public void unsetSuccess() {
-      this.success = null;
-    }
-
-    /** Returns true if field success is set (has been assigned a value) and false otherwise */
-    public boolean isSetSuccess() {
-      return this.success != null;
-    }
-
-    public void setSuccessIsSet(boolean value) {
-      if (!value) {
-        this.success = null;
-      }
     }
 
     public void setFieldValue(_Fields field, @org.apache.thrift.annotation.Nullable java.lang.Object value) {
       switch (field) {
-      case SUCCESS:
-        if (value == null) {
-          unsetSuccess();
-        } else {
-          setSuccess((NodeData)value);
-        }
-        break;
-
       }
     }
 
     @org.apache.thrift.annotation.Nullable
     public java.lang.Object getFieldValue(_Fields field) {
       switch (field) {
-      case SUCCESS:
-        return getSuccess();
-
       }
       throw new java.lang.IllegalStateException();
     }
@@ -6670,8 +6611,6 @@ public class Node {
       }
 
       switch (field) {
-      case SUCCESS:
-        return isSetSuccess();
       }
       throw new java.lang.IllegalStateException();
     }
@@ -6689,25 +6628,12 @@ public class Node {
       if (this == that)
         return true;
 
-      boolean this_present_success = true && this.isSetSuccess();
-      boolean that_present_success = true && that.isSetSuccess();
-      if (this_present_success || that_present_success) {
-        if (!(this_present_success && that_present_success))
-          return false;
-        if (!this.success.equals(that.success))
-          return false;
-      }
-
       return true;
     }
 
     @Override
     public int hashCode() {
       int hashCode = 1;
-
-      hashCode = hashCode * 8191 + ((isSetSuccess()) ? 131071 : 524287);
-      if (isSetSuccess())
-        hashCode = hashCode * 8191 + success.hashCode();
 
       return hashCode;
     }
@@ -6720,16 +6646,6 @@ public class Node {
 
       int lastComparison = 0;
 
-      lastComparison = java.lang.Boolean.compare(isSetSuccess(), other.isSetSuccess());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      if (isSetSuccess()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, other.success);
-        if (lastComparison != 0) {
-          return lastComparison;
-        }
-      }
       return 0;
     }
 
@@ -6751,13 +6667,6 @@ public class Node {
       java.lang.StringBuilder sb = new java.lang.StringBuilder("setNodeSuccessor_result(");
       boolean first = true;
 
-      sb.append("success:");
-      if (this.success == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.success);
-      }
-      first = false;
       sb.append(")");
       return sb.toString();
     }
@@ -6765,9 +6674,6 @@ public class Node {
     public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
-      if (success != null) {
-        success.validate();
-      }
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -6804,15 +6710,6 @@ public class Node {
             break;
           }
           switch (schemeField.id) {
-            case 0: // SUCCESS
-              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.success = new NodeData();
-                struct.success.read(iprot);
-                struct.setSuccessIsSet(true);
-              } else { 
-                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-              }
-              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -6828,11 +6725,6 @@ public class Node {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
-        if (struct.success != null) {
-          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
-          struct.success.write(oprot);
-          oprot.writeFieldEnd();
-        }
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -6850,25 +6742,11 @@ public class Node {
       @Override
       public void write(org.apache.thrift.protocol.TProtocol prot, setNodeSuccessor_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TTupleProtocol oprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
-        java.util.BitSet optionals = new java.util.BitSet();
-        if (struct.isSetSuccess()) {
-          optionals.set(0);
-        }
-        oprot.writeBitSet(optionals, 1);
-        if (struct.isSetSuccess()) {
-          struct.success.write(oprot);
-        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, setNodeSuccessor_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
-        java.util.BitSet incoming = iprot.readBitSet(1);
-        if (incoming.get(0)) {
-          struct.success = new NodeData();
-          struct.success.read(iprot);
-          struct.setSuccessIsSet(true);
-        }
       }
     }
 

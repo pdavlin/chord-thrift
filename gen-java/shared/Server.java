@@ -16,7 +16,6 @@ public class Server {
 		TServerTransport serverTransport = new TServerSocket(9090);
 		TTransportFactory factory = new TTransportFactory();
 
-
 		SupernodeHandler supernodeHandler = new SupernodeHandler();
 
 		Supernode.Processor supernodeProcessor = new Supernode.Processor(supernodeHandler);

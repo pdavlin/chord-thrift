@@ -3,7 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
+import java.util.Scanner;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -35,8 +35,16 @@ public class Client {
                 //Try to connect to supernode
                 nodeTransport.open();	
 		System.out.println("connected to Node server on port: " + Integer.toString(nodeData.port));
-
-		String title = nodeClient.get("A Tale of Two Cities");
-		System.out.println("nodeClient.get() returned: " + title);
+	
+		Scanner scanner = new Scanner(System.in);
+		//Testing loop
+		while (true) {
+			System.out.println("Enter Key to get succ/pred for: ");
+			int id = scanner.nextInt();
+			nodeClient.findSuccessor(id);
+			nodeClient.findPred(id);
+		}
+		//String title = nodeClient.get("A Tale of Two Cities");
+		//System.out.println("nodeClient.get() returned: " + title);
 	}
 }
