@@ -45,7 +45,19 @@ public class Client {
 			nodeClient.findPred(id);*/
 			String bookData = scanner.nextLine();
 			String[] bookDataArray = bookData.split(";");
-			nodeClient.setBook(bookDataArray[0], bookDataArray[1]);
+			String method = bookDataArray[0];
+			String title = bookDataArray[1];
+			String genre = "";
+			if (bookDataArray.length > 2) {
+				genre = bookDataArray[2];
+
+			}
+			if (method == "get") {
+				nodeClient.get(title);
+			}
+			else {
+				nodeClient.setBook(title, genre);
+			}
 		}
 		//String title = nodeClient.get("A Tale of Two Cities");
 		//System.out.println("nodeClient.get() returned: " + title);

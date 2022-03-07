@@ -163,7 +163,6 @@ public class NodeHandler implements Node.Iface {
 			nodeLog("bookList.get key: {} on node {}", key, currentNode.id);
 			if (bookList.containsKey(fullHash)) {
 				genre = bookList.get(fullHash);
-				return genre;
 			}
 			else {
 				nodeLog("key: {} does not exist on node: {}", key, currentNode.id);
@@ -176,14 +175,15 @@ public class NodeHandler implements Node.Iface {
 			// Try to connect
 			nodeLog("opening transport on port {}", node.port);
 			transport.open();
-			nodeLog("attempting client.setBook()");
+			nodeLog("attempting client.get()");
 
 			
 			String n = client.get(book_title);
-			nodeLog("client.setBook() returned");
+			nodeLog("client.get() returned");
 			nodeLog("closing transport on port {}", node.port);
 			transport.close();
 		}
+		nodeLog("genre for book:  {} :: {}", book_title, genre);
 		return genre;
 	}
 
@@ -223,6 +223,7 @@ public class NodeHandler implements Node.Iface {
 		}
 		NodeData predecessor = findPred(key);
 
+		nodeLog("predecessor found: {}", predecessor.id);
 		if (predecessor.id == currentNode.id) {
 			return nodes.get(0);
 		}
@@ -233,6 +234,7 @@ public class NodeHandler implements Node.Iface {
 		nodeLog("opening transport on port {}", predecessor.port);
 		transport.open();
 		nodeLog("attempting client.getNodeSuccessor()");
+
 
 		// TODO: locking here when adding node 2 to cluster
 		NodeData n = client.getNodeSuccessor();
