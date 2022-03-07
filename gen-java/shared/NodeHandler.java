@@ -44,6 +44,7 @@ public class NodeHandler implements Node.Iface {
 		TProtocol protocol = new TBinaryProtocol(transport);
 		Supernode.Client client = new Supernode.Client(protocol);
 		// Try to connect
+		nodeLog("opening transport on port {}", 9090);
 		transport.open();
 		nodeLog("Node Connected to SN");
 
@@ -75,11 +76,12 @@ public class NodeHandler implements Node.Iface {
 			TProtocol nodeProtocol = new TBinaryProtocol(nodeTransport);
 			Node.Client nodeClient = new Node.Client(nodeProtocol);
 			// Try to connect
-			nodeLog("opening transport");
+			nodeLog("opening transport on port {}", nodeData.port);
 			nodeTransport.open();
 			nodeLog("Calling client.findSuccessor");
 			NodeData n = nodeClient.findSuccessor(key);
 			nodes.add(n);
+			nodeLog("closing transport on port {}", nodeData.port);
 			nodeTransport.close();
 			nodeLog("Calling client.findPred");
 			// NodeData predNode = nodeClient.findPred(key);
@@ -91,15 +93,19 @@ public class NodeHandler implements Node.Iface {
 			TProtocol predProtocol = new TBinaryProtocol(predTransport);
 			Node.Client predClient = new Node.Client(predProtocol);
 			// Try to connect
+			nodeLog("opening transport on port {}", predNode.port);
 			predTransport.open();
 			predClient.setNodeSuccessor(currentNode);
 			// predClient.updateDHT();
+			nodeLog("closing transport on port {}", predNode.port);
 			predTransport.close();
 			// Update current node finger table
 			updateDHT();
+			nodeLog("opening transport on port {}", predNode.port);
 			predTransport.open();
 			// Update other node finger tables
 			predClient.updateDHT();
+			nodeLog("closing transport on port {}", predNode.port);
 			predTransport.close();
 			client.postJoin(currentNode.port);
 		} else {
@@ -172,12 +178,14 @@ public class NodeHandler implements Node.Iface {
 		TProtocol protocol = new TBinaryProtocol(transport);
 		Node.Client client = new Node.Client(protocol);
 		// Try to connect
+		nodeLog("opening transport on port {}", predecessor.port);
 		transport.open();
 		nodeLog("attempting client.getNodeSuccessor()");
 
 		// TODO: locking here when adding node 2 to cluster
 		NodeData n = client.getNodeSuccessor();
 		nodeLog("client.getNodeSuccessor() returned");
+		nodeLog("closing transport on port {}", predecessor.port);
 		transport.close();
 		// return findPred(key);
 		return n;
@@ -185,31 +193,44 @@ public class NodeHandler implements Node.Iface {
 
 	@Override
 	public NodeData findPred(int key) {
+
+		printNodesInTable("findPred");
+
+		int currentId = currentNode.id;
 		nodeLog("Finding predecessor for key {}", key);
 		// Compare node to successor
-		nodeLog("Current Node: {}", currentNode.id);
+		nodeLog("Current Node: {}", currentId);
 
 		NodeData tempNode = nodes.get(0);
-
+		int tempId = tempNode.id;
 		nodeLog("successor ID: {}", tempNode.id);
 
 		// TODO: HOW DO I DO THIS LOGIC CORRECTLY I AM LOCKING MY STUFFFFFFFFFFFF
 
-		if (currentNode.id < tempNode.id) {
-			if (key > currentNode.id && key <= tempNode.id) {
-				nodeLog("Predecessor for key: {}", currentNode.id);
+		if (currentId < tempId) {
+			if (key > currentId && key <= tempId) {
+				nodeLog("Predecessor for key {}: {}", key, currentId);
 				return currentNode;
 			}
 		}
-		if (currentNode.id > tempNode.id) {
-			if (currentNode.id < key && key >= tempNode.id) {
-				nodeLog("Predecessor for key: {}", currentNode.id);
+		if (currentId > tempId) {
+			if (currentId < key && key >= tempId) {
+				nodeLog("Predecessor for key {}: {}", key, currentId);
 			}
 			return currentNode;
 		}
 
-		nodeLog("Predecessor for key: {}", tempNode.id);
+		nodeLog("Predecessor for key {}: {}", key, tempId);
 		return tempNode;
+	}
+
+	private void printNodesInTable(String logPoint) {
+		String nodeListTemp = "Current nodes in table at {}: ";
+		for (int i = 0; i < nodes.size(); i++) {
+			NodeData n = nodes.get(i);
+			nodeListTemp = nodeListTemp + Integer.toString(n.id) + " ";
+		}
+		nodeLog(nodeListTemp, logPoint);
 	}
 
 	@Override
