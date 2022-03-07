@@ -212,15 +212,19 @@ public class NodeHandler implements Node.Iface {
 				nodeLog("Predecessor for key {}: {}", key, currentId);
 				return currentNode;
 			}
+			/*else {
+				tempNode = findClosestPrecedingFinger(key);
+			}*/
 		}
 		if (currentId > tempId) {
-			if (currentId < key && key >= tempId) {
+			if (currentId < key && key <= tempId) {
 				nodeLog("Predecessor for key {}: {}", key, currentId);
+				return currentNode;
 			}
-			return currentNode;
+			//return currentNode;
 		}
 
-		nodeLog("Predecessor for key {}: {}", key, tempId);
+		nodeLog("Predecessor for key {}: {}", key, tempNode.id);
 		return tempNode;
 	}
 

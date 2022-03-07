@@ -27,3 +27,5 @@ backup/
 
 .vscode/
 lib/
+
+*.swp
