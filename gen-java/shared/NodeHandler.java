@@ -125,14 +125,66 @@ public class NodeHandler implements Node.Iface {
 
 	@Override
 	public boolean setBook(java.lang.String book_title, java.lang.String genre) throws org.apache.thrift.TException {
+		int key = getHashKey(book_title);
+		String fullHash = getHash(book_title);
+		NodeData node = findSuccessor(key);
+		if (currentNode.id == key || node.id == currentNode.id) {
+			nodeLog("bookList.put key: {} on node {}", key, currentNode.id);
+			bookList.put(fullHash, genre);
+			return true;
+		}
+		else {
+			TTransport transport = new TSocket("localhost", node.port);
+			TProtocol protocol = new TBinaryProtocol(transport);
+			Node.Client client = new Node.Client(protocol);
+			// Try to connect
+			nodeLog("opening transport on port {}", node.port);
+			transport.open();
+			nodeLog("attempting client.setBook()");
+
+			
+			boolean n = client.setBook(book_title, genre);
+			nodeLog("client.setBook() returned");
+			nodeLog("closing transport on port {}", node.port);
+			transport.close();
+		}
 		return true;
 	}
 
 	@Override
 	public java.lang.String get(java.lang.String book_title) throws org.apache.thrift.TException {
 		nodeLog("Node: {} attempting to get() for book {}", currentNode.port, book_title);
-		nodeLog("Title hash: {}", getHashKey(book_title));
-		return "test";
+		nodeLog("Title hash key: {}", getHashKey(book_title));
+		String genre = "";
+		int key = getHashKey(book_title);
+		String fullHash = getHash(book_title);
+		NodeData node = findSuccessor(key);
+		if (currentNode.id == key || node.id == currentNode.id) {
+			nodeLog("bookList.get key: {} on node {}", key, currentNode.id);
+			if (bookList.containsKey(fullHash)) {
+				genre = bookList.get(fullHash);
+				return genre;
+			}
+			else {
+				nodeLog("key: {} does not exist on node: {}", key, currentNode.id);
+			}
+		}
+		else {
+			TTransport transport = new TSocket("localhost", node.port);
+			TProtocol protocol = new TBinaryProtocol(transport);
+			Node.Client client = new Node.Client(protocol);
+			// Try to connect
+			nodeLog("opening transport on port {}", node.port);
+			transport.open();
+			nodeLog("attempting client.setBook()");
+
+			
+			String n = client.get(book_title);
+			nodeLog("client.setBook() returned");
+			nodeLog("closing transport on port {}", node.port);
+			transport.close();
+		}
+		return genre;
 	}
 
 	@Override
@@ -208,7 +260,9 @@ public class NodeHandler implements Node.Iface {
 		// TODO: HOW DO I DO THIS LOGIC CORRECTLY I AM LOCKING MY STUFFFFFFFFFFFF
 
 		if (currentId < tempId) {
+			nodeLog("Current Id {} < tempId {} ", currentId, tempId);
 			if (key > currentId && key <= tempId) {
+				nodeLog("Key > Current Id {} and <= tempId {} ", currentId, tempId);
 				nodeLog("Predecessor for key {}: {}", key, currentId);
 				return currentNode;
 			}
@@ -217,7 +271,9 @@ public class NodeHandler implements Node.Iface {
 			}*/
 		}
 		if (currentId > tempId) {
-			if (currentId < key && key <= tempId) {
+			nodeLog("Current Id {} > tempId {} ", currentId, tempId);
+			if (currentId < key || key <= tempId) {
+				nodeLog("Key > Current Id {} or <= tempId {} ", currentId, tempId);
 				nodeLog("Predecessor for key {}: {}", key, currentId);
 				return currentNode;
 			}
@@ -294,6 +350,30 @@ public class NodeHandler implements Node.Iface {
 		}
 	}
 
+
+	public static String getHash(String input) {
+		try {
+			nodeLog("Attempting to get hash for string: {}", input);
+			MessageDigest md = MessageDigest.getInstance("SHA-1");
+			byte[] encoded = md.digest(input.getBytes("UTF-8"));
+			StringBuffer hex = new StringBuffer();
+
+			for (int i = 0; i < encoded.length; i++) {
+				String j = Integer.toHexString(0xff & encoded[i]);
+				if (j.length() == 1) {
+					hex.append('0');
+				}
+				hex.append(j);
+			}
+			return hex.toString();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
 	public static int hashToId(String input) {
 		char lastChar = input.substring(input.length() - 1).charAt(0);
 		return Character.digit(lastChar, 16);

@@ -39,10 +39,13 @@ public class Client {
 		Scanner scanner = new Scanner(System.in);
 		//Testing loop
 		while (true) {
-			System.out.println("Enter Key to get succ/pred for: ");
+			/*System.out.println("Enter Key to get succ/pred for: ");
 			int id = scanner.nextInt();
 			nodeClient.findSuccessor(id);
-			nodeClient.findPred(id);
+			nodeClient.findPred(id);*/
+			String bookData = scanner.nextLine();
+			String[] bookDataArray = bookData.split(";");
+			nodeClient.setBook(bookDataArray[0], bookDataArray[1]);
 		}
 		//String title = nodeClient.get("A Tale of Two Cities");
 		//System.out.println("nodeClient.get() returned: " + title);
