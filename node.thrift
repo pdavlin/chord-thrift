@@ -47,5 +47,7 @@ service Node {
 	NodeData findPred(1: i32 key),
 	NodeData findClosestPrecedingFinger(1: i32 key),
 	NodeData getNodeSuccessor(),
-	void setNodeSuccessor(1: NodeData successor)
+	void setNodeSuccessor(1: NodeData successor),
+	void directUpdateDHT(1: i32 s, 2: i32 i)
+
 }

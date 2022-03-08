@@ -1,0 +1,33 @@
+get;Nonexistant book
+N0:  Node: 9092 attempting to get() for book Nonexistant book
+N0:  Attempting to get hash for string: Nonexistant book
+N0:  Title hash key: 15
+N0:  Attempting to get hash for string: Nonexistant book
+N0:  Attempting to get hash for string: Nonexistant book
+N0:  Finding successor for key 15
+N0:  Current nodes in table at findPred: 6 6 6 0
+N0:  Finding predecessor for key 15
+N0:  Current Node: 0
+N0:  successor ID: 6
+N0:  Current Id 0 < tempId 6
+N0:  Finding closest finger for key 15 at node ID 0
+N0:  Current nodes in table at findClosestPrecedingFinger: 6 6 6 0
+N0:  finger 3 = 0
+N0:  finger 2 = 6
+N0:  Current Id 0 < fId 6
+N0:  fId 6 < key 15
+N0:  Predecessor for key 15: 6
+N0:  Predecessor for key 15: 6
+N0:  predecessor found: 6
+N0:  opening transport on port 9091
+N0:  attempting client.getNodeSuccessor()
+N6:  getNodeSuccessor reached at node 6: 9091
+N6:  Current nodes in table at getNodeSuccessor: : 0 0 0 0
+N6:  getNodeSuccessor: 6:9091 -> 0:9092
+N0:  client.getNodeSuccessor() returned
+N0:  closing transport on port 9091
+N0:  bookList.get key: 15 on node 0
+N0:  key: 15 does not exist on node: 0
+N0:  genre for book:  Nonexistant book ::
+
+***No book genre/key results returns null genre***

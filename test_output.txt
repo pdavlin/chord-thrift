@@ -1,0 +1,136 @@
+root@csci-8920-ubuntu:/home/csci8920/chordthrift/gen-java/shared# java -cp "/home/csci8920/chordthrift/libthrift-0.15.0.jar:/home/csci8920/chordthrift/slf4j-api-1.7.9.jar:/home/csci8920/chordthrift/javax.annotation-api-1.3.2.jar:." Client -d
+starting client on port 9090
+INITIALIZING NODE CONNECTION TO SUPERNODE
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+Node Connected to SN
+getNode reached @ supernode
+Returning node @ index: 0
+getNode returned Port: 9091
+connected to Node server on port: 9091
+set;Hamlet;play
+N6:  Attempting to get hash for string: Hamlet
+N6:  Attempting to get hash for string: Hamlet
+N6:  Finding successor for key 9
+N6:  Current nodes in table at findPred: 0 0 0 0
+N6:  Finding predecessor for key 9
+N6:  Current Node: 6
+N6:  successor ID: 0
+N6:  Current Id 6 > tempId 0
+N6:  Key > Current Id 6 or <= tempId 0
+N6:  Predecessor for key 9: 6
+N6:  predecessor found: 6
+N6:  opening transport on port 9092
+N6:  attempting client.setBook()
+N0:  Attempting to get hash for string: Hamlet
+N0:  Attempting to get hash for string: Hamlet
+N0:  Finding successor for key 9
+N0:  Current nodes in table at findPred: 6 6 6 0
+N0:  Finding predecessor for key 9
+N0:  Current Node: 0
+N0:  successor ID: 6
+N0:  Current Id 0 < tempId 6
+N0:  Finding closest finger for key 9 at node ID 0
+N0:  Current nodes in table at findClosestPrecedingFinger: 6 6 6 0
+N0:  finger 3 = 0
+N0:  finger 2 = 6
+N0:  Current Id 0 < fId 6
+N0:  fId 6 < key 9
+N0:  Predecessor for key 9: 6
+N0:  Predecessor for key 9: 6
+N0:  predecessor found: 6
+N0:  opening transport on port 9091
+N0:  attempting client.getNodeSuccessor()
+N6:  getNodeSuccessor reached at node 6: 9091
+N6:  Current nodes in table at getNodeSuccessor: : 0 0 0 0
+N6:  getNodeSuccessor: 6:9091 -> 0:9092
+N0:  client.getNodeSuccessor() returned
+N0:  closing transport on port 9091
+N0:  bookList.put key: 9 on node 0
+N6:  client.setBook() returned
+N6:  closing transport on port 9092
+set;King Lear;fantasy
+N6:  Attempting to get hash for string: King Lear
+N6:  Attempting to get hash for string: King Lear
+N6:  Finding successor for key 3
+N6:  Current nodes in table at findPred: 0 0 0 0
+N6:  Finding predecessor for key 3
+N6:  Current Node: 6
+N6:  successor ID: 0
+N6:  Current Id 6 > tempId 0
+N6:  Predecessor for key 3: 0
+N6:  predecessor found: 0
+N6:  opening transport on port 9092
+N6:  attempting client.getNodeSuccessor()
+N0:  getNodeSuccessor reached at node 0: 9092
+N0:  Current nodes in table at getNodeSuccessor: : 6 6 6 0
+N0:  getNodeSuccessor: 0:9092 -> 6:9091
+N6:  client.getNodeSuccessor() returned
+N6:  closing transport on port 9092
+N6:  bookList.put key: 3 on node 6
+get;King Lear
+N6:  Node: 9091 attempting to get() for book King Lear
+N6:  Attempting to get hash for string: King Lear
+N6:  Title hash key: 3
+N6:  Attempting to get hash for string: King Lear
+N6:  Attempting to get hash for string: King Lear
+N6:  Finding successor for key 3
+N6:  Current nodes in table at findPred: 0 0 0 0
+N6:  Finding predecessor for key 3
+N6:  Current Node: 6
+N6:  successor ID: 0
+N6:  Current Id 6 > tempId 0
+N6:  Predecessor for key 3: 0
+N6:  predecessor found: 0
+N6:  opening transport on port 9092
+N6:  attempting client.getNodeSuccessor()
+N0:  getNodeSuccessor reached at node 0: 9092
+N0:  Current nodes in table at getNodeSuccessor: : 6 6 6 0
+N0:  getNodeSuccessor: 0:9092 -> 6:9091
+N6:  client.getNodeSuccessor() returned
+N6:  closing transport on port 9092
+N6:  bookList.get key: 3 on node 6
+N6:  genre for book:  King Lear :: fantasy
+set;King Lear;really good
+N6:  Attempting to get hash for string: King Lear
+N6:  Attempting to get hash for string: King Lear
+N6:  Finding successor for key 3
+N6:  Current nodes in table at findPred: 0 0 0 0
+N6:  Finding predecessor for key 3
+N6:  Current Node: 6
+N6:  successor ID: 0
+N6:  Current Id 6 > tempId 0
+N6:  Predecessor for key 3: 0
+N6:  predecessor found: 0
+N6:  opening transport on port 9092
+N6:  attempting client.getNodeSuccessor()
+N0:  getNodeSuccessor reached at node 0: 9092
+N0:  Current nodes in table at getNodeSuccessor: : 6 6 6 0
+N0:  getNodeSuccessor: 0:9092 -> 6:9091
+N6:  client.getNodeSuccessor() returned
+N6:  closing transport on port 9092
+N6:  bookList.put key: 3 on node 6
+get;King Lear
+N6:  Node: 9091 attempting to get() for book King Lear
+N6:  Attempting to get hash for string: King Lear
+N6:  Title hash key: 3
+N6:  Attempting to get hash for string: King Lear
+N6:  Attempting to get hash for string: King Lear
+N6:  Finding successor for key 3
+N6:  Current nodes in table at findPred: 0 0 0 0
+N6:  Finding predecessor for key 3
+N6:  Current Node: 6
+N6:  successor ID: 0
+N6:  Current Id 6 > tempId 0
+N6:  Predecessor for key 3: 0
+N6:  predecessor found: 0
+N6:  opening transport on port 9092
+N6:  attempting client.getNodeSuccessor()
+N0:  getNodeSuccessor reached at node 0: 9092
+N0:  Current nodes in table at getNodeSuccessor: : 6 6 6 0
+N0:  getNodeSuccessor: 0:9092 -> 6:9091
+N6:  client.getNodeSuccessor() returned
+N6:  closing transport on port 9092
+N6:  bookList.get key: 3 on node 6
+N6:  genre for book:  King Lear :: really good

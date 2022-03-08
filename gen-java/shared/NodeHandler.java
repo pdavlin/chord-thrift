@@ -83,11 +83,13 @@ public class NodeHandler implements Node.Iface {
 			nodes.add(n);
 			nodeLog("closing transport on port {}", nodeData.port);
 			nodeTransport.close();
-			nodeLog("Calling client.findPred");
+			nodeLog("Calling client.findPred from initNode");
 			// NodeData predNode = nodeClient.findPred(key);
 			predNode = findPred(key);
 
 			nodeLog("Key {} successor: {}", key, n.id);
+			nodeLog("Key {} predecessor: {}", key, predNode.id);
+
 
 			TTransport predTransport = new TSocket("localhost", predNode.port);
 			TProtocol predProtocol = new TBinaryProtocol(predTransport);
@@ -101,12 +103,22 @@ public class NodeHandler implements Node.Iface {
 			predTransport.close();
 			// Update current node finger table
 			updateDHT();
-			nodeLog("opening transport on port {}", predNode.port);
-			predTransport.open();
-			// Update other node finger tables
-			predClient.updateDHT();
-			nodeLog("closing transport on port {}", predNode.port);
-			predTransport.close();
+			for (int i = 3; i >= 0; i--) {
+				int fingerkey = currentNode.id - ((int) Math.pow(2, (i-1)));
+				fingerkey += 16;
+				fingerkey %= 16;
+				if (fingerkey < 16) {
+					predNode = findSuccessor(fingerkey);
+				}
+
+
+				nodeLog("opening transport on port {}", predNode.port);
+				predTransport.open();
+				// Update other node finger tables
+				predClient.updateDHT();
+				nodeLog("closing transport on port {}", predNode.port);
+				predTransport.close();
+			}
 			client.postJoin(currentNode.port);
 		} else {
 			nodeLog("Empty node returned - building fresh finger table");
@@ -217,7 +229,7 @@ public class NodeHandler implements Node.Iface {
 			return currentNode;
 		}
 		// Only node in cluster will hold all keys
-		if (nodes.size() == 0 || nodes.size() == 1) {
+		if (nodes.size() == 0 ) {
 			nodeLog("No nodes in finger table, this node will hold all keys");
 			predNode = currentNode;
 			return currentNode;
@@ -236,7 +248,9 @@ public class NodeHandler implements Node.Iface {
 			int fingerkey = currentNode.id + (int) (Math.pow(2, i));
                         fingerkey = fingerkey % 16;
 			NodeData finger = nodes.get(i);
-			if (fingerkey == predecessor.id) {
+				
+			if (fingerkey == key) {
+				nodeLog("fingerkey {} @ fingertable row {} = predecessor.id {} , returning: {} as successor ", fingerkey, i, predecessor.id, finger.id);
 				return finger;
 			}
 		}*/
@@ -246,11 +260,8 @@ public class NodeHandler implements Node.Iface {
 		Node.Client client = new Node.Client(protocol);
 		// Try to connect
 		nodeLog("opening transport on port {}", predecessor.port);
-		if (!transport.isOpen()) {
-			transport.open();
-		}
 		nodeLog("attempting client.getNodeSuccessor()");
-
+		transport.open();
 
 		// TODO: locking here when adding node 2 to cluster
 		NodeData n = client.getNodeSuccessor();
@@ -316,6 +327,8 @@ public class NodeHandler implements Node.Iface {
 		printNodesInTable("findClosestPrecedingFinger");
 		for (int i = nodes.size() - 1; i >= 0; i--) {
 			NodeData f = nodes.get(i);
+			int tempId = f.id;
+			int currentId = currentNode.id;
 			nodeLog("finger {} = {}", i, f.id);
 			/*if (currentId < tempId) {
 				nodeLog("Current Id {} < tempId {} ", currentId, tempId);
@@ -328,7 +341,7 @@ public class NodeHandler implements Node.Iface {
 				else {
 					tempNode = findClosestPrecedingFinger(key);
 				}
-			}*/
+			}
 			if (currentNode.id >= key) {
 				nodeLog("Current Id {} > key {} ", currentNode.id, key);
 				if (f.id > currentNode.id || f.id <= key) {
@@ -339,10 +352,40 @@ public class NodeHandler implements Node.Iface {
 				//return currentNode;
 			}	
 			//else (f.id > currentNode.id && f.id >= key) {
-			else if (f.id <= key) {
+			//else if (f.id <= key) {
+			else if (currentNode.id < f.id)
 				return f;
+			}*/
+			if (currentId < tempId) {
+				nodeLog("Current Id {} < fId {} ", currentId, tempId);
+				//if (key > currentId && key <= tempId) {
+				if (tempId <= key) {
+					nodeLog("fId {} < key {} ", tempId, key);
+					nodeLog("Predecessor for key {}: {}", key, tempId);
+					return f;
+				}
+				/*if (tempId == key) {
+					return currentNode;
+				}*/
+
+				/*else {
+					tempNode = findClosestPrecedingFinger(key);
+				}*/
 			}
+			if (currentId == key && nodes.size() == 1) {
+				return nodes.get(0);
+			}
+			/*if (currentId > tempId) {
+				nodeLog("Current Id {} > tempId {} ", currentId, tempId);
+				if (currentId < key || key <= tempId) {
+					nodeLog("Key > Current Id {} or <= tempId {} ", currentId, tempId);
+					nodeLog("Predecessor for key {}: {}", key, currentId);
+					return currentNode;
+				}
+				//return currentNode;
+			}*/
 		}
+		nodeLog("NO LOWER FINGER FOUND FOR KEY {}", key);
 		return currentNode;
 	}
 
@@ -363,8 +406,11 @@ public class NodeHandler implements Node.Iface {
 	@Override
 	public void setNodeSuccessor(NodeData successor) {
 		if (nodes.size() > 0) {
-			nodes.set(0, successor);
-			nodeLog("Node {} successor updated to {}", successor.id);
+			NodeData s = nodes.get(0);
+			if (successor.id <= s.id) { 
+				nodes.set(0, successor);
+				nodeLog("Node {} successor updated to {}", successor.id);
+			}
 		}
 	}
 	

@@ -43,6 +43,9 @@ public class Client {
 			int id = scanner.nextInt();
 			nodeClient.findSuccessor(id);
 			nodeClient.findPred(id);*/
+			System.out.println("Enter a command: ");
+			System.out.println("to get a book: get;<title>");
+			System.out.println("to set/update a book: set;<title>;genre");
 			String bookData = scanner.nextLine();
 			String[] bookDataArray = bookData.split(";");
 			String method = bookDataArray[0];
