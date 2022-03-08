@@ -52,7 +52,7 @@ public class Client {
 				genre = bookDataArray[2];
 
 			}
-			if (method == "get") {
+			if (method.compareTo("get") == 0) {
 				nodeClient.get(title);
 			}
 			else {

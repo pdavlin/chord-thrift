@@ -205,6 +205,7 @@ public class NodeHandler implements Node.Iface {
 			}
 			nodeLog("{}: Key {} successor: {}", i, key, n.id);
 		}
+		printNodesInTable("updateDHT completed: ");
 	}
 
 	@Override
@@ -216,7 +217,7 @@ public class NodeHandler implements Node.Iface {
 			return currentNode;
 		}
 		// Only node in cluster will hold all keys
-		if (nodes.size() == 0) {
+		if (nodes.size() == 0 || nodes.size() == 1) {
 			nodeLog("No nodes in finger table, this node will hold all keys");
 			predNode = currentNode;
 			return currentNode;
@@ -227,12 +228,27 @@ public class NodeHandler implements Node.Iface {
 		if (predecessor.id == currentNode.id) {
 			return nodes.get(0);
 		}
+		if (predecessor.port == currentNode.port) {
+			return nodes.get(0);
+		}
+
+		/*for (int i = 0; i < nodes.size(); i++) {
+			int fingerkey = currentNode.id + (int) (Math.pow(2, i));
+                        fingerkey = fingerkey % 16;
+			NodeData finger = nodes.get(i);
+			if (fingerkey == predecessor.id) {
+				return finger;
+			}
+		}*/
+
 		TTransport transport = new TSocket("localhost", predecessor.port);
 		TProtocol protocol = new TBinaryProtocol(transport);
 		Node.Client client = new Node.Client(protocol);
 		// Try to connect
 		nodeLog("opening transport on port {}", predecessor.port);
-		transport.open();
+		if (!transport.isOpen()) {
+			transport.open();
+		}
 		nodeLog("attempting client.getNodeSuccessor()");
 
 
@@ -259,8 +275,6 @@ public class NodeHandler implements Node.Iface {
 		int tempId = tempNode.id;
 		nodeLog("successor ID: {}", tempNode.id);
 
-		// TODO: HOW DO I DO THIS LOGIC CORRECTLY I AM LOCKING MY STUFFFFFFFFFFFF
-
 		if (currentId < tempId) {
 			nodeLog("Current Id {} < tempId {} ", currentId, tempId);
 			if (key > currentId && key <= tempId) {
@@ -268,9 +282,10 @@ public class NodeHandler implements Node.Iface {
 				nodeLog("Predecessor for key {}: {}", key, currentId);
 				return currentNode;
 			}
-			/*else {
+			
+			else {
 				tempNode = findClosestPrecedingFinger(key);
-			}*/
+			}
 		}
 		if (currentId > tempId) {
 			nodeLog("Current Id {} > tempId {} ", currentId, tempId);
@@ -298,9 +313,33 @@ public class NodeHandler implements Node.Iface {
 	@Override
 	public NodeData findClosestPrecedingFinger(int key) {
 		nodeLog("Finding closest finger for key {} at node ID {}", key, currentNode.id);
+		printNodesInTable("findClosestPrecedingFinger");
 		for (int i = nodes.size() - 1; i >= 0; i--) {
 			NodeData f = nodes.get(i);
-			if (f.id > currentNode.id && f.id < key) {
+			nodeLog("finger {} = {}", i, f.id);
+			/*if (currentId < tempId) {
+				nodeLog("Current Id {} < tempId {} ", currentId, tempId);
+				if (key > currentId && key <= tempId) {
+					nodeLog("Key > Current Id {} and <= tempId {} ", currentId, tempId);
+					nodeLog("Predecessor for key {}: {}", key, currentId);
+					return currentNode;
+				}
+				
+				else {
+					tempNode = findClosestPrecedingFinger(key);
+				}
+			}*/
+			if (currentNode.id >= key) {
+				nodeLog("Current Id {} > key {} ", currentNode.id, key);
+				if (f.id > currentNode.id || f.id <= key) {
+					nodeLog("f.id > Current Id {} or <= key {} ", currentNode.id, key);
+					nodeLog("Predecessor for key {}: {}", key, currentNode.id);
+					return f;
+				}
+				//return currentNode;
+			}	
+			//else (f.id > currentNode.id && f.id >= key) {
+			else if (f.id <= key) {
 				return f;
 			}
 		}
@@ -310,6 +349,7 @@ public class NodeHandler implements Node.Iface {
 	@Override
 	public NodeData getNodeSuccessor() {
 		nodeLog("getNodeSuccessor reached at node {}: {}", currentNode.id, currentNode.port);
+		printNodesInTable("getNodeSuccessor: ");
 		if (nodes.size() > 0) {
 			NodeData s = nodes.get(0);
 			nodeLog("getNodeSuccessor: {}:{} -> {}:{}", currentNode.id, currentNode.port, s.id, s.port);
@@ -325,6 +365,22 @@ public class NodeHandler implements Node.Iface {
 		if (nodes.size() > 0) {
 			nodes.set(0, successor);
 			nodeLog("Node {} successor updated to {}", successor.id);
+		}
+	}
+	
+	@Override
+	public void directUpdateDHT(int s, int i) {
+		NodeData f = nodes.get(i);
+		if (s < i) {
+			if (s >= currentNode.id && s < f.id) {
+				NodeData p = predNode;
+				//TODO: connct to pred node?
+				//p.directUpdateDHT(s, i);
+			}
+
+		}
+		else {
+
 		}
 	}
 
